@@ -16,6 +16,8 @@ db.serialize(() => {
         ['Morning', 'English', 'Good Morning Boss', 'Casual'],
         ['Afternoon', 'English', 'Good Afternoon', 'Formal'],
         ['Afternoon', 'English', 'Good Afternoon Boss', 'Casual'],
+        ['Evening', 'English', 'Good Evening', 'Formal'],
+        ['Evening', 'English', 'Good Evening Boss', 'Casual'],
         ['Morning', 'French', 'Bonjour', 'Formal'],
         ['Morning', 'French', 'Salut', 'Casual'],
         ['Evening', 'Spanish', 'Buenas Noches', 'Formal']
