@@ -3,6 +3,9 @@
 ## URL
 [http://localhost:4040](http://localhost:4040)
 
+## GITHUB
+[Assignment-2-PROG3175](https://github.com/Bandiggo/Assignment-2-PROG3175)
+
 ## Endpoints
 ### POST /greet
 - **Description**: Returns a complete greeting message
