@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database(':memory:');
+const db = new sqlite3.Database('./greetings.db');
 
 db.serialize(() => {
-    db.run(`CREATE TABLE Greetings (
+    db.run(`CREATE TABLE IF NOT EXISTS Greetings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timeOfDay TEXT,
         language TEXT,
@@ -23,8 +23,15 @@ db.serialize(() => {
         ['Evening', 'Spanish', 'Buenas Noches', 'Formal']
     ];
 
-    greetings.forEach(greeting => stmt.run(greeting));
-    stmt.finalize();
+    greetings.forEach(greeting => {
+        db.get(`SELECT 1 FROM Greetings WHERE timeOfDay = ? AND language = ? AND greetingMessage = ? AND tone = ?`, greeting, (err, row) => {
+            if (!row) {
+                const stmt = db.prepare(`INSERT INTO Greetings (timeOfDay, language, greetingMessage, tone) VALUES (?, ?, ?, ?)`);
+                stmt.run(greeting);
+                stmt.finalize();
+            }
+        });
+    });
 });
 
 module.exports = db;
