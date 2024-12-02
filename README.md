@@ -1,7 +1,7 @@
 # Assignment 2 PROG3175
 
 ## URL
-[http://localhost:4040](http://localhost:4040)
+[Vercel app](https://assignment-2-prog-3175.vercel.app/)
 
 ## GITHUB
 [Assignment-2-PROG3175](https://github.com/Bandiggo/Assignment-2-PROG3175)
@@ -39,3 +39,8 @@
   {
     "language": "English"
   }
+
+### How to run console app:
+- Navigate to Assignment-2-PROG3175\Assignment 1 PROG3175 Console App AK from terminal
+- Run the following code: dotnet run
+- Follow the steps to get your greeting
