@@ -1,37 +1,52 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./greetings.db');
+require('dotenv').config();
+const { Pool } = require('pg');
 
-db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS Greetings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+});
+
+const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS Greetings (
+        id SERIAL PRIMARY KEY,
         timeOfDay TEXT,
         language TEXT,
         greetingMessage TEXT,
         tone TEXT
-    )`);
+    )
+`;
 
-    const stmt = db.prepare(`INSERT INTO Greetings (timeOfDay, language, greetingMessage, tone) VALUES (?, ?, ?, ?)`);
-    const greetings = [
-        ['Morning', 'English', 'Good Morning', 'Formal'],
-        ['Morning', 'English', 'Good Morning Boss', 'Casual'],
-        ['Afternoon', 'English', 'Good Afternoon', 'Formal'],
-        ['Afternoon', 'English', 'Good Afternoon Boss', 'Casual'],
-        ['Evening', 'English', 'Good Evening', 'Formal'],
-        ['Evening', 'English', 'Good Evening Boss', 'Casual'],
-        ['Morning', 'French', 'Bonjour', 'Formal'],
-        ['Morning', 'French', 'Salut', 'Casual'],
-        ['Evening', 'Spanish', 'Buenas Noches', 'Formal']
-    ];
+const insertGreetingQuery = `
+    INSERT INTO Greetings (timeOfDay, language, greetingMessage, tone)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT DO NOTHING
+`;
 
-    greetings.forEach(greeting => {
-        db.get(`SELECT 1 FROM Greetings WHERE timeOfDay = ? AND language = ? AND greetingMessage = ? AND tone = ?`, greeting, (err, row) => {
-            if (!row) {
-                const stmt = db.prepare(`INSERT INTO Greetings (timeOfDay, language, greetingMessage, tone) VALUES (?, ?, ?, ?)`);
-                stmt.run(greeting);
-                stmt.finalize();
-            }
-        });
-    });
-});
+const greetings = [
+    ['Morning', 'English', 'Good Morning', 'Formal'],
+    ['Morning', 'English', 'Good Morning Boss', 'Casual'],
+    ['Afternoon', 'English', 'Good Afternoon', 'Formal'],
+    ['Afternoon', 'English', 'Good Afternoon Boss', 'Casual'],
+    ['Evening', 'English', 'Good Evening', 'Formal'],
+    ['Evening', 'English', 'Good Evening Boss', 'Casual'],
+    ['Morning', 'French', 'Bonjour', 'Formal'],
+    ['Morning', 'French', 'Salut', 'Casual'],
+    ['Evening', 'Spanish', 'Buenas Noches', 'Formal']
+];
 
-module.exports = db;
+(async () => {
+    const client = await pool.connect();
+    try {
+        await client.query(createTableQuery);
+
+        for (const greeting of greetings) {
+            await client.query(insertGreetingQuery, greeting);
+        }
+        console.log('Database setup complete.');
+    } catch (err) {
+        console.error('Error executing query', err.stack);
+    } finally {
+        client.release();
+    }
+})().catch(err => console.error('Error connecting to the database', err.stack));
+
+module.exports = pool;
